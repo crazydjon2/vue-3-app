@@ -1,12 +1,23 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
-</script>
-
 <template>
-  <header></header>
-
-  <RouterView />
+  <div v-if="result && result.cities && result.cities.length">
+    <ul v-for="(city, index) in result.cities" :key="city.id">
+      <li>{{ index }}. {{ city.name }}</li>
+    </ul>
+  </div>
 </template>
+
+<script setup lang="ts">
+import gql from "graphql-tag";
+import { useQuery } from '@vue/apollo-composable'
+const { result } = useQuery(gql`
+  query cities {
+    cities {
+      id
+    name
+  }
+  }
+`)
+</script>
 
 <style scoped>
 header {
