@@ -1,22 +1,29 @@
 <template>
-  <div v-if="result && result.cities && result.cities.length">
-    <ul v-for="(city, index) in result.cities" :key="city.id">
-      <li>{{ index }}. {{ city.name }}</li>
+  <div v-if="countries && countries.length">
+    <ul v-for="(country, index) in countries" :key="country.id">
+      <li>{{ index + 1 }}. {{ country.name }}</li>
+    </ul>
+  </div>
+  <div v-if="countries && cities.length">
+    <ul v-for="(city, index) in cities" :key="city.id">
+      <li>{{ index + 1 }}. {{ city.name }}</li>
     </ul>
   </div>
 </template>
 
 <script setup lang="ts">
 import gql from "graphql-tag";
-import { useQuery } from '@vue/apollo-composable'
-const { result } = useQuery(gql`
-  query cities {
-    cities {
-      id
-    name
-  }
-  }
-`)
+import { onMounted } from "vue";
+import { useCountries } from './stores/countries.js'
+
+const countriesStore = useCountries()
+const countries = countriesStore.countries
+const cities = countriesStore.cities
+
+onMounted(() => {
+  countriesStore.getCountries()
+  countriesStore.getCities()
+})
 </script>
 
 <style scoped>
