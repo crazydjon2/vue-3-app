@@ -1,91 +1,73 @@
 <template>
-  <div v-if="countries && countries.length">
-    <ul v-for="(country, index) in countries" :key="country.id">
-      <li>{{ index + 1 }}. {{ country.name }}</li>
-    </ul>
-  </div>
-  <div v-if="countries && cities.length">
-    <ul v-for="(city, index) in cities" :key="city.id">
-      <li>{{ index + 1 }}. {{ city.name }}</li>
-    </ul>
+  <div class="app">
+    <div>
+      <h3>Countries</h3>
+      <div v-if="countries && countries.value && countries.value.length">
+        <ul v-for="(country, index) in countries.value" :key="country.id">
+          <li>{{ index + 1 }}. {{ country.name }}</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <h3>Cities</h3>
+      <SearchCountry />
+      <div v-if="countries && cities.length">
+        <ul v-for="(city, index) in cities" :key="city.id">
+          <li>{{ index + 1 }}. {{ city.name }}</li>
+        </ul>
+      </div>
+    </div>
+
+    <div>
+      <div v-for="item in items" :key="item.id">
+        {{ item.name }}
+      </div>
+      <button @click="pushItem">Push</button>
+      <button @click="clearItems">Clear</button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import gql from "graphql-tag";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
+import type { Ref} from "vue";
 import { useCountries } from './stores/countries.js'
+import SearchCountry from "./components/SearchCountry.vue";
 
 const countriesStore = useCountries()
 const countries = countriesStore.countries
 const cities = countriesStore.cities
 
+const items: Ref<any> = ref([])
+
 onMounted(() => {
   countriesStore.getCountries()
   countriesStore.getCities()
 })
+
+function pushItem() {
+  items.value.push({ name: 'Test', id: 1 })
+}
+
+function clearItems() {
+  items.value = []
+}
 </script>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+.app {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  grid-column-gap: 10px;
+  grid-row-gap: 1em;
+
+  max-width: 1200px;
+  padding: 16px;
+  margin: auto;
+
+  background: lightgrey;
 }
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
 </style>

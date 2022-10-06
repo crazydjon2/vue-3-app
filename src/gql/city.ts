@@ -8,3 +8,12 @@ query cities {
     }
   }
 `;
+
+export const SEARCH_COUNTRIES = gql`
+query city($slug: String!) {
+    city(input: { slug: $slug }) {
+      name
+      id
+    }
+  }
+`;

@@ -3,12 +3,14 @@ import gql from "graphql-tag";
 import { ref } from "vue";
 import type { Ref } from "vue";
 import { apolloClient } from "@/plugins/apollo.js";
-import { GET_CITIES } from "@/gql/city";
+import { GET_CITIES, SEARCH_COUNTRIES } from "@/gql/city";
 
 interface ICountry {
   name: string;
   id: string;
 }
+
+let timer = null;
 
 export const useCountries = defineStore("countries", () => {
   const countries: Ref<ICountry[]> = ref([]);
@@ -27,7 +29,9 @@ export const useCountries = defineStore("countries", () => {
         `,
       })
       .then((result) => {
-        Object.assign(this.countries, result.data.countries);
+        this.countries = [...result.data.countries]
+        // Object.assign(this.countries, result.data.countries);
+        console.log(this.countries)
       });
   }
 
@@ -38,5 +42,22 @@ export const useCountries = defineStore("countries", () => {
     });
   }
 
-  return { countries, cities, getCountries, getCities };
+  function searchCity(slug: string) {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      apolloClient
+        .query({
+          query: SEARCH_COUNTRIES,
+          variables: {
+            slug,
+          },
+        })
+        .then((result) => {
+          this.cities.push(result.data.city)
+          console.log(this.cities);
+        });
+    }, 400);
+  }
+
+  return { countries, cities, getCountries, getCities, searchCity };
 });
